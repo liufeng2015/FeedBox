@@ -1,0 +1,104 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+	"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="AccountsMapper">
+			
+			
+	<!-- 查询所用 -->
+	<select id="getALL" parameterType="pd" resultType="pd">
+		select *
+		from 
+			t_accounts
+		where 
+			dr = 0
+	</select>
+	
+	<!-- 修改 -->
+	<update id="edit" parameterType="pd">
+		update  t_accounts
+			set acsName = #{acsName},
+				App_Id = #{App_Id},
+				App_secret  = #{App_secret},
+				status = #{status},
+				updateDate = #{updateDate},
+				dr = #{dr},
+				organizer= #{organizer}
+			where 
+			  acsId =  #{acsId}
+	</update>
+	
+	<!-- 新增 -->
+	<insert id="save" parameterType="pd">
+		insert into t_accounts (
+			acsName,
+			App_Id,
+			App_secret,
+			status,
+			organizer,
+			createDate,
+			dr
+		) values (
+			#{acsName},
+			#{App_Id},
+			#{App_secret},
+			#{status},
+			#{organizer},
+			#{createDate},
+			0
+		)
+	</insert>
+
+	
+	<!-- 查询总数 -->
+	<select id="findCount" parameterType="pd" resultType="pd">
+		select 
+			count(acsId) ZS
+		from 
+			t_accounts
+		where 
+			dr = 0
+	</select>
+	
+	<!-- 校验重复 -->
+	<select id="findRepeatCount" parameterType="pd" resultType="pd">
+		select top 1
+			acsId
+		from 
+			t_accounts
+		where 
+			dr=0 
+		
+		
+	</select>
+	
+	
+	<!-- 列表 -->
+	<select id="dictlistPage" parameterType="page" resultType="pd">
+		 select * FROM (  
+					select ROW_NUMBER()Over(order by z1.createDate desc) as rowId, * from t_accounts z1 
+					where z1.dr = 0 
+				)as mytable  where 1=1 
+	</select>
+	
+	
+	
+	<!-- 删除用户 -->
+	<update id="delete" parameterType="pd">
+			update  t_accounts set 
+			deleteDate=#{deleteDate},
+			deleteUser=#{deleteUser},
+			dr=1 
+			where acsId = #{acsId}
+	</update>
+	
+	
+	<!-- 通过id获取数据 -->
+	<select id="findById" parameterType="pd" resultType="pd">
+		select *
+		from 
+			t_accounts
+		where 
+			acsId = #{acsId}
+	</select>
+	
+</mapper>

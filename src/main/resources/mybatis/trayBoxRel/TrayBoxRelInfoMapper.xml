@@ -1,0 +1,156 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+	"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="TrayBoxRelInfoMapper">
+	
+	<!-- 新增 -->
+	<insert id="save" parameterType="pd">
+		insert into t_trayBoxRel (
+		    ID,
+		    TrayId,
+			TrayRFID,
+			TrayRFID2,
+			BoxQRCode,
+			BoxId,
+			State,
+			DR,
+			CreateTime,
+			CreateUser
+		) values (
+			#{ID},
+			#{TrayId},
+			#{TrayRFID},
+			#{TrayRFID2},
+			#{BoxQRCode},
+			#{BoxId},
+			#{State},
+			0,
+			#{CreateTime},
+			#{CreateUser}
+		)
+	</insert>
+	
+	<!-- 列表1：查询已选中的物料箱列表 -->
+	<select id="dictChooselistPage" parameterType="page" resultType="pd">
+		 select * FROM (  
+			SELECT
+				ROW_NUMBER () OVER (ORDER BY t1.CreateTime DESC) AS rowId,
+				t3.ID as TrayId,
+				t3.RFID,
+				t3.TrayName,
+				t1.ID as BoxId,
+				t1.QRCode,
+				t1.BoxType,
+				t1.FullNumber,
+				t1.PlantNumber,
+				t1.BoxDate,
+				t1.AssemblyNumber,
+				t1.Address,
+				t1.State,
+				t2.ID
+			FROM
+				t_box t1
+			LEFT JOIN t_trayBoxRel t2 ON t1.ID = t2.BoxId
+			AND t2.DR = 0
+			LEFT JOIN t_tray t3 ON t2.TrayId = t3.ID
+			AND t3.DR = 0
+			WHERE
+				t1.DR = 0
+			<if test="pd.TrayName != null and pd.TrayName != ''">
+				and t3.TrayName like '%'+#{pd.TrayName} +'%'
+			</if>
+			<if test="pd.TrayId != null and pd.TrayId != ''">
+				and t3.ID = #{pd.TrayId} 
+			</if>
+			<if test="pd.RFID != null and pd.RFID != ''">
+				and t3.RFID = #{pd.RFID} 
+			</if>
+			<if test="pd.QRCode != null and pd.QRCode != ''">
+				and t1.QRCode = #{pd.QRCode} 
+			</if>
+         )as mytable  where 1=1  
+	</select>
+	
+	<!-- 列表2:查询未选中的物料箱列表 -->
+	<select id="dictNoChooselistPage" parameterType="page" resultType="pd">
+		 select * FROM (  
+			SELECT
+				ROW_NUMBER () OVER (ORDER BY t1.CreateTime DESC) AS rowId,
+				t1.*
+			FROM
+				t_box t1
+			WHERE t1.DR = 0
+			and t1.ID NOT IN (
+							SELECT
+								t2.BoxId
+							FROM
+								t_trayBoxRel t2	
+							WHERE t2.DR = 0
+						)
+         )as mytable  where 1=1  
+	</select>
+	
+	<!-- 列表1：查询已选中的零件列表 -->
+	<select id="dictChoosePartlistPage" parameterType="page" resultType="pd">
+		 select * FROM (  
+			SELECT
+				ROW_NUMBER () OVER (ORDER BY z1.CreateTime DESC) AS rowId,
+				z1.*, T1.TrayName,
+				t1.RFID,
+				t1.RFID2
+			FROM
+				t_part z1
+			LEFT JOIN t_tray T1 ON z1.TrayId = T1.ID
+			AND T1.DR = 0
+			WHERE
+				z1.DR = 0
+			<if test="pd.TrayId != null and pd.TrayId != ''">
+				and z1.TrayId = #{pd.TrayId} 
+			</if>		
+         )as mytable  where 1=1  
+	</select>
+	
+	<!-- 列表2:查询未选中的零件列表 -->
+	<select id="dictNoChoosePartlistPage" parameterType="page" resultType="pd">
+		select * FROM (  
+			select 
+			    ROW_NUMBER () OVER (ORDER BY z1.CreateTime DESC) AS rowId,
+				z1.*, 
+				T1.TrayName,
+				t1.RFID,
+				t1.RFID2
+			FROM
+				t_part z1
+			LEFT JOIN t_tray T1 ON z1.TrayId = T1.ID
+				AND T1.DR = 0
+			WHERE
+				z1.DR = 0
+			and (z1.TrayId = '' or  z1.TrayId is null)
+		 )as mytable  where 1=1  
+	</select>
+	
+	<!-- 列表(全部) -->
+	<select id="listAll" parameterType="pd" resultType="pd">
+		select
+				a.*
+		from 
+				t_trayBoxRel a
+		where a.DR = 0
+		<if test="TrayId != null and TrayId != ''">
+			and a.TrayId = #{TrayId} 
+		</if>
+		<if test="BoxId != null and BoxId != ''">
+			and a.BoxId = #{BoxId} 
+		</if>
+	</select>
+	
+	<!-- 删除单条关系数据 -->
+	<update id="delete" parameterType="pd">
+			update  t_trayBoxRel set			
+			DeleteTime=#{DeleteTime},
+			DeleteUser=#{DeleteUser},
+			DR=1,
+			State = 1	
+			where ID = #{ID}
+	</update>
+</mapper>

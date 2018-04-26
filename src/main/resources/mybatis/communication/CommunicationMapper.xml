@@ -1,0 +1,95 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+	"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="CommunicationMapper">
+			
+			
+	
+	<!-- 修改 -->
+	<update id="edit" parameterType="pd">
+				
+		UPDATE t_communication
+		   SET
+		      E_ID =#{E_ID}
+		      ,Name = #{Name}
+		      ,Post = #{Post}
+		      ,Phone = #{Phone}
+		      ,EMail = #{EMail}
+		      ,UpdateTime = #{UpdateTime}
+		      ,UpdateUser = #{UpdateUser}
+		 WHERE 
+		 	 C_ID = #{C_ID}
+
+	</update>
+	
+	<!-- 通过id获取数据 -->
+	<select id="findById" parameterType="pd" resultType="pd">
+		select *
+		from 
+			t_communication
+		where 
+			 C_ID = #{C_ID}
+	</select>
+	
+	<!-- 新增 -->
+	<insert id="save" parameterType="pd">
+		insert t_communication (
+			 C_ID
+			,E_ID
+           	,Name
+           	,Post
+           	,Phone
+           	,EMail
+           	,CreateTime
+           	,CreateUser
+           	,DR
+		) values (
+			#{C_ID},
+			#{E_ID},
+			#{Name},
+			#{Post},
+			#{Phone},
+			#{EMail},
+			#{CreateTime},
+			#{CreateUser},
+			0
+		)
+	</insert>
+	
+	<!-- 列表 -->
+	<select id="dictlistPage" parameterType="page" resultType="pd">
+		 select *  FROM (  
+					select ROW_NUMBER()Over(order by z1.CreateTime desc) as rowId, z1.*,z2.Name as EnterpriseName from t_communication z1,t_enterprise z2 
+					where z1.DR = 0 and z1.E_ID=z2.E_ID
+						<if test="pd.FuzzySearch != null and pd.FuzzySearch != ''">
+							and (
+									z1.Name like '%'+#{pd.FuzzySearch} +'%' or 
+									z1.Post like '%'+#{pd.FuzzySearch} +'%' or 
+									z1.Phone like '%'+#{pd.FuzzySearch} +'%' or
+									z1.EMail like '%'+#{pd.FuzzySearch} +'%' or
+									z2.Name like '%'+#{pd.FuzzySearch} +'%' 
+									
+							)
+						</if>
+					        
+				)as mytable  where 1=1 
+	</select>
+	
+	<select id="findByEId" parameterType="pd" resultType="pd">
+		select * from t_communication where	 DR=0 AND E_ID = #{E_ID}
+	</select>
+	
+	
+	<!-- 删除用户 -->
+	<update id="delete" parameterType="pd">
+			update  t_communication set 
+			
+			DeleteTime=#{DeleteTime},
+			DeleteUser=#{DeleteUser},
+			DR=1 
+			
+			where C_ID = #{C_ID}
+	</update>
+	
+	
+</mapper>

@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+	"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="BusinessLogicMapper">
+	
+	<!-- 新增 -->
+	<insert id="save" parameterType="pd">
+		insert into t_business (
+			ID,
+			EID,
+			ADDRESS,
+			CreateTime,
+			CreateUser
+		) values (
+			#{ID},
+			#{EID},
+			#{ADDRESS},		
+			#{CreateTime},
+			#{CreateUser}
+		)
+	</insert>
+	
+	<!-- 删除 -->
+	<delete id="delete" parameterType="pd">
+		delete from t_business		
+		<if test="EID != null and EID != ''">
+			where EID = #{EID}
+		</if>
+	</delete>
+	
+	
+	<!--列表(全部) -->
+	<select id="listAllEidData" parameterType="pd" resultType="pd">
+		select *
+		from t_business
+		where 1 = 1
+		<if test="EID != null and EID != ''"><!-- 角色检索 -->
+			and EID=#{EID} 
+		</if>		
+	</select>
+</mapper>

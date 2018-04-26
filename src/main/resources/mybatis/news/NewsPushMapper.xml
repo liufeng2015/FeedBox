@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+	"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="NewsPushMapper">
+			
+			
+	
+	
+	<!-- 通过id获取数据 -->
+	<select id="findById" parameterType="pd" resultType="pd">
+		select *
+		from 
+			t_newsPush
+		where 
+			 NP_ID = #{NP_ID}
+	</select>
+	
+	<!-- 新增 -->
+	<insert id="save" parameterType="pd">
+		insert t_newsPush (
+			 NP_ID
+			,N_ID
+           	,E_ID
+           	,C_ID
+           	,IsRead
+           	,CreateTime
+           	,CreateUser
+		) values (
+			#{NP_ID},
+			#{N_ID},
+			#{E_ID},
+			#{C_ID},
+			0,
+			#{CreateTime},
+			#{CreateUser}
+		)
+	</insert>
+	
+	<!-- 列表 -->
+	<select id="dictlistPage" parameterType="page" resultType="pd">
+		 select *  FROM (  
+					select ROW_NUMBER()Over(order by z1.CreateTime desc) as rowId, z1.*,z2.Name as EnterpriseName ,z3.Name,z3.Post from t_newsPush z1,t_enterprise z2,t_communication z3
+					where z1.E_ID=z2.E_ID and z1.C_ID=z3.C_ID 
+					
+					and z1.N_ID=#{pd.N_ID}
+					
+						<if test="pd.FuzzySearch != null and pd.FuzzySearch != ''">
+							and (
+									z2.Name like '%'+#{pd.FuzzySearch} +'%' 
+							)
+						</if>
+					        
+				)as mytable  where 1=1 
+	</select>
+	
+	
+	<!-- 删除用户 -->
+	<delete id="delete" parameterType="pd">
+			delete from t_newsPush
+			where NP_ID = #{NP_ID}
+	</delete>
+	
+	<update id="push" parameterType="pd">
+			update  t_newsPush set
+			PushTime=#{PushTime}
+			where N_ID = #{N_ID}
+	</update>
+	
+	
+	<update id="read" parameterType="pd">
+			update  t_newsPush set
+			ReadTime=#{ReadTime}
+			where NP_ID = #{NP_ID}
+	</update>
+	
+</mapper>

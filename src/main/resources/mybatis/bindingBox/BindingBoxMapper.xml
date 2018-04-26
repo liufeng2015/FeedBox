@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+	"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="BindingBoxMapper">
+	
+	<!-- 修改 -->
+	<update id="edit" parameterType="pd">
+		update  t_bindingBox
+			set CreateTime    = #{CreateTime},
+				No    = #{No},
+				Address    = #{Address},
+				Model = #{Model},
+				PartNumber= #{PartNumber},
+				AddressName= #{AddressName},
+				Sclass=#{Sclass}		
+			where 
+				B_ID = #{B_ID}
+				
+
+	</update>
+	
+	<!-- 通过id获取数据 -->
+	<select id="findById" parameterType="pd" resultType="pd">
+		select *
+		from 
+			t_bindingBox
+		where 
+			B_ID = #{B_ID}
+	</select>
+	
+	<select id="getNo" parameterType="pd" resultType="pd">
+		
+		select (isnull(MAX(no),0)+1)as No from t_bindingbox where createtime>(DATEADD(YYYY,DATEDIFF(YYYY,0,getdate()),0))
+		
+		<if test="Address != null and Address != ''">
+			and Address =#{Address}
+		</if>
+	</select>
+	
+	<!-- 新增 -->
+	<insert id="save" parameterType="pd">
+		insert into t_bindingBox (
+			B_ID,
+			CreateTime,
+			No,
+			Address,
+			Model,
+			PartNumber,
+			AddressName,
+			Sclass
+		) values (
+			#{B_ID},
+			#{CreateTime},
+			#{No},
+			#{Address},
+			#{Model},
+			#{PartNumber},
+			#{AddressName},
+			#{Sclass}
+		)
+	</insert>
+	
+	<!-- 列表 -->
+	<select id="dictlistPage" parameterType="page" resultType="pd">
+		SELECT
+				*
+			FROM
+				(
+					SELECT
+						ROW_NUMBER () OVER (ORDER BY t1.CreateTime DESC) AS rowId,*
+					FROM
+						t_bindingBox t1
+					
+				) AS mytable
+			WHERE 1 = 1
+
+	</select>
+	
+	
+	
+</mapper>

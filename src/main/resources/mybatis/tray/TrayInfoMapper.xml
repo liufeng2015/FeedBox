@@ -1,0 +1,245 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+	"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="TrayInfoMapper">
+	
+	<!-- 修改 -->
+	<update id="edit" parameterType="pd">
+		update  t_tray
+			set RFID    = #{RFID},
+			    RFID2    = #{RFID2},
+				TrayName    = #{TrayName},
+				TrayType    = #{TrayType},
+				FullNumber    = #{FullNumber},
+				PlantNumber = #{PlantNumber},
+				TrayDate= #{TrayDate},
+				AssemblyNumber= #{AssemblyNumber},
+				Address= #{Address},
+				State= #{State},
+				UpdateTime  = #{UpdateTime},
+				UpdateUser  = #{UpdateUser},
+				EP=#{EP}		
+			where 
+				ID = #{ID}
+	</update>
+	
+	<!-- 修改托盘状态 -->
+	<update id="editTrayState" parameterType="pd">
+		update  t_tray
+			set State= #{State},
+			    Sclass= #{Sclass},
+				UpdateTime  = #{UpdateTime},
+				UpdateUser  = #{UpdateUser}
+			<if test="EP != null and EP != ''">
+				,EP = #{EP}
+			</if>
+			where 
+				DR = 0
+			<if test="RFID != null and RFID != ''">
+				and (
+				   RFID = #{RFID} or
+				   RFID2 = #{RFID}
+				)
+			</if>
+			<if test="TrayId != null and TrayId != ''">
+				and ID = #{TrayId}
+			</if>
+			
+	</update>
+	
+	<!-- 通过id获取数据 -->
+	<select id="findById" parameterType="pd" resultType="pd">
+		select *
+		from 
+			t_tray
+		where 
+			ID = #{ID}
+	</select>
+	
+	<!-- 通过托盘编号获取数据 -->
+	<select id="findByName" parameterType="pd" resultType="pd">
+		select *
+			from 
+				t_tray
+			where 
+				TrayName = #{TrayName}
+	</select>
+	
+	<!-- 新增 -->
+	<insert id="save" parameterType="pd">
+		insert into t_tray (
+			ID,
+			RFID,
+			RFID2,
+			TrayName,
+			TrayType,
+			FullNumber,
+			PlantNumber,
+			TrayDate,
+			AssemblyNumber,
+			Address,
+			State,
+			DR,
+			CreateTime,
+			CreateUser,
+			EP
+		) values (
+			#{ID},
+			#{RFID},
+			#{RFID2},
+			#{TrayName},
+			#{TrayType},
+			#{FullNumber},
+			#{PlantNumber},
+			#{TrayDate},
+			#{AssemblyNumber},
+			#{Address},
+			#{State},
+			0,
+			#{CreateTime},
+			#{CreateUser},
+			#{EP}
+		)
+	</insert>
+	
+	<!-- 新增 -->
+	<insert id="saveTrayLog" parameterType="pd">
+		insert into t_tray_log (
+			ID,
+			RFID,
+			RFID2,
+			TrayName,
+			TrayType,
+			FullNumber,
+			PlantNumber,
+			TrayDate,
+			AssemblyNumber,
+			Address,
+			State,
+			DR,
+			CreateTime,
+			CreateUser
+		) values (
+			#{ID},
+			#{RFID},
+			#{RFID2},
+			#{TrayName},
+			#{TrayType},
+			#{FullNumber},
+			#{PlantNumber},
+			#{TrayDate},
+			#{AssemblyNumber},
+			#{Address},
+			#{State},
+			0,
+			#{CreateTime},
+			#{CreateUser}
+		)
+	</insert>
+	
+	<!-- 列表 -->
+	<select id="dictlistPage" parameterType="page" resultType="pd">
+		 select * FROM (  
+					select ROW_NUMBER()Over(order by t1.CreateTime desc) as rowId,
+						COUNT (t2.id) as partSize,
+						t1.ID,
+						t1.RFID,
+						t1.RFID2,
+						t1.TrayName,
+						t1.TrayType,
+						t1.FullNumber,
+						t1.PlantNumber,
+						t1.TrayDate,
+						t1.AssemblyNumber,
+						t1.Address,
+						t1.EP,
+						t1.State
+					FROM
+						t_tray t1
+					LEFT JOIN t_part t2 ON t1.ID = t2.TrayId
+					AND t2.DR = 0
+					WHERE
+						t1.DR = 0
+					<if test="pd.FuzzySearch != null and pd.FuzzySearch != ''">
+						and (
+								t1.TrayName like '%'+#{pd.FuzzySearch} +'%'or 
+								t1.RFID like '%'+#{pd.FuzzySearch} +'%' or 
+								t1.RFID2 like '%'+#{pd.FuzzySearch} +'%' or 
+								t1.TrayType like '%'+#{pd.FuzzySearch} +'%' or
+								t1.TrayDate like '%'+#{pd.FuzzySearch} +'%'	or
+								t1.State like '%'+#{pd.FuzzySearch} +'%'				
+						)
+					</if>
+					
+					<if test="pd.Address != null and pd.Address != ''">
+							and	t1.Address =#{pd.Address}  
+					</if>
+					
+					
+					<if test="pd.TrayType != null and pd.TrayType != ''">
+							and	t1.TrayType =#{pd.TrayType}  
+					</if>
+					GROUP BY
+						t1.ID,
+						t1.RFID,
+						t1.RFID2,
+						t1.TrayName,
+						t1.TrayType,
+						t1.FullNumber,
+						t1.PlantNumber,
+						t1.TrayDate,
+						t1.AssemblyNumber,
+						t1.Address,
+						t1.EP,
+						t1.State,
+						t1.CreateTime					    
+				)as mytable  where 1=1  
+	</select>
+	
+	<!-- 校验重复 -->
+	<select id="findRepeatCount" parameterType="pd" resultType="pd">
+		select top 1
+			*
+		from 
+			t_tray
+		where 
+			DR=0
+			
+		<if test="TrayName != null and TrayName != ''">
+			and TrayName = #{TrayName} 
+		</if>
+		<if test="RFID != null and RFID != ''">
+			and (
+			   RFID = #{RFID} or
+			   RFID2 = #{RFID}
+			)
+		</if>
+		<if test="RFID2 != null and RFID2 != ''">
+			and (
+			   RFID = #{RFID2} or
+			   RFID2 = #{RFID2}
+			)
+		</if>
+	</select>
+	
+	<!-- 删除 -->
+	<update id="delete" parameterType="pd">
+			update  t_tray set			
+			DeleteTime=#{DeleteTime},
+			DeleteUser=#{DeleteUser},
+			DR=1			
+			where ID = #{ID}
+	</update>
+	
+	<!-- 编辑托盘车的状态和位置状态-->
+	<update id="updateTrayState" parameterType="pd">
+			update  t_tray set
+			Address= #{Address},
+			State= #{State},
+			EP= #{EP},
+			
+			UpdateTime  = #{UpdateTime},
+			UpdateUser  = #{UpdateUser}	
+			where ID = #{ID}
+	</update>
+</mapper>

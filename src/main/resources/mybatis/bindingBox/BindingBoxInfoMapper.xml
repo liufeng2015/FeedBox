@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+	"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="BindingBoxInfoMapper">
+	
+	<!-- 修改 -->
+	<update id="edit" parameterType="pd">
+		update  t_bindingBoxInfo
+			set B_ID    = #{B_ID},
+				QRCode    = #{QRCode},
+				QRCodeShow    = #{QRCodeShow}
+			where 
+				BI_ID = #{BI_ID}
+				
+
+	</update>
+	
+	<!-- 通过id获取数据 -->
+	<select id="findById" parameterType="pd" resultType="pd">
+		select *
+		from 
+			t_bindingBoxInfo
+		where 
+			BI_ID = #{BI_ID}
+	</select>
+	
+	
+	
+	<!-- 新增 -->
+	<insert id="save" parameterType="pd">
+		insert into t_bindingBoxInfo (
+			BI_ID,
+			B_ID,
+			QRCode,
+			QRCodeShow
+		) values (
+			#{BI_ID},
+			#{B_ID},
+			#{QRCode},
+			#{QRCodeShow}
+		)
+	</insert>
+	
+	<!-- 列表 -->
+	<select id="dictlistPage" parameterType="page" resultType="pd">
+		SELECT
+				*
+			FROM
+				(
+					SELECT
+						ROW_NUMBER () OVER (ORDER BY t1.BI_ID) AS rowId,*
+					FROM
+						t_bindingBoxInfo t1
+						where 1=1
+						<if test="pd.B_ID != null and pd.B_ID != ''">
+							and B_ID = #{pd.B_ID}
+						</if>
+					
+				) AS mytable
+			WHERE 1 = 1
+
+	</select>
+	
+	<select id="getListByBID" parameterType="pd" resultType="pd">
+		SELECT * FROM t_bindingBoxInfo t1 where 1=1
+			<if test="B_ID != null and B_ID != ''">
+				and B_ID = #{B_ID}
+			</if>
+					
+	</select>
+	
+	
+</mapper>

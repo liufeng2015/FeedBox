@@ -1,0 +1,278 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+	"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="PartInfoMapper">
+	
+	<!-- 修改 -->
+	<update id="edit" parameterType="pd">
+		update  t_part
+			set QRCode    = #{QRCode},
+				PartName    = #{PartName},
+				PartType    = #{PartType},
+				PartDate = #{PartDate},
+				AssemblyNumber= #{AssemblyNumber},
+				PlantStructure= #{PlantStructure},
+				State= #{State},
+				RowNumber= #{RowNumber},
+				GroupNumber= #{GroupNumber},
+				DateNumber= #{DateNumber},
+				LineNumber= #{LineNumber},
+				VMNumber= #{VMNumber},
+				SerialNumber= #{SerialNumber},
+				UpdateTime  = #{UpdateTime},
+				UpdateUser  = #{UpdateUser},
+				UseTime=#{UseTime},
+				UseAddress=#{UseAddress},
+				EP=#{EP}
+			where 
+				ID = #{ID}
+	</update>
+	
+	<!-- 通过id获取数据 -->
+	<select id="findById" parameterType="pd" resultType="pd">
+		select *
+		from 
+			t_part
+		where 
+			ID = #{ID}
+	</select>
+	
+	<!-- 通过名称获取数据 -->
+	<select id="findByName" parameterType="pd" resultType="pd">
+		select *
+		from 
+			t_part
+		where 
+			PartName = #{PartName}
+	</select>
+	
+	
+	<select id="findByQRCode" parameterType="pd" resultType="pd">
+		select *
+		from 
+			t_part
+		where 
+			QRCode = #{QRCode}
+	</select>
+	<!-- 新增 -->
+	<insert id="save" parameterType="pd">
+		insert into t_part (
+			ID,
+			QRCode,
+			PartName,
+			PartType,
+			State,
+			TrayId,
+			DR,
+			Address,
+			CreateTime,
+			CreateUser,
+			UseTime,
+			UseAddress,
+			EP
+		) values (
+			#{ID},
+			#{QRCode},
+			#{PartName},
+			#{PartType},
+			#{State},
+			#{TrayId},
+			0,
+			#{Address},
+			#{CreateTime},
+			#{CreateUser},
+			#{UseTime},
+			#{UseAddress},
+			#{EP}
+		)
+	</insert>
+	
+	
+	<!-- 列表 -->
+	<select id="dictlistPage" parameterType="page" resultType="pd">
+		 select * FROM (  
+					select ROW_NUMBER()Over(order by z1.CreateTime desc) as rowId, * from t_part z1 
+					where DR=0		
+					
+						<if test="pd.TrayId != null and pd.TrayId != ''">
+							and TrayId=#{pd.TrayId}	
+						</if>
+						<if test="pd.PartState != null and pd.PartState != ''">
+							and State=#{pd.PartState}	
+						</if>
+						
+						
+						<if test="pd.startTime != null and pd.startTime != ''">
+							and CreateTime&gt;#{pd.startTime} 
+						</if>
+					
+						<if test="pd.endTime != null and pd.endTime != ''">
+							and CreateTime &lt;#{pd.endTime} 
+						</if> 
+						
+						
+						<if test="pd.UseStartTime != null and pd.UseStartTime != ''">
+							and UseTime&gt;#{pd.UseStartTime} 
+						</if>
+					
+						<if test="pd.UseEndTime != null and pd.UseEndTime != ''">
+							and UseTime &lt;#{pd.UseEndTime} 
+						</if> 
+						
+						<if test="pd.PartType != null and pd.PartType != ''">
+								and	PartType =#{pd.PartType}  
+						</if>
+						
+						
+						<if test="pd.Line != null and pd.Line != '' and pd.PartType != null and pd.PartType != '' ">
+							<if test="pd.Line == '1'.toString() and pd.PartType =='KW曲轴'.toString()" >
+								and	Address like  '%EP1%'  
+							</if>
+							<if test="pd.Line == '2'.toString() and pd.PartType =='KW曲轴'.toString()" >
+								and	Address like  '%EP3曲轴下线点1%'  
+							</if>  
+							<if test="pd.Line == '3'.toString() and pd.PartType =='KW曲轴'.toString()" >
+								and	Address like  '%EP3曲轴下线点2%'  
+							</if>
+							
+							<if test="pd.Line == '1'.toString() and pd.PartType =='AGW平衡轴'.toString()" >
+								and	Address like  '%EP1平衡轴下线点1%'  
+							</if>
+							
+							<if test="pd.Line == '2'.toString() and pd.PartType =='AGW平衡轴'.toString()" >
+								and	Address like  '%EP1平衡轴下线点2%'  
+							</if>
+						</if>
+						
+						
+					    <if test="pd.FuzzySearch != null and pd.FuzzySearch != ''">
+							and (
+									QRCode like '%'+#{pd.FuzzySearch} +'%' 							
+							)
+						</if>
+				)as mytable  where 1=1  
+	</select>
+	
+	<!-- 列表 -->
+	<select id="getPartListAll" parameterType="pd" resultType="pd">
+		
+					select top 24 * from t_part z1 
+					where DR=0	and (z1.trayId = null or z1.trayId = '') and CreateTime is not null
+					<if test="State != null and State != ''">
+						and State = #{State} 
+					</if>
+					<if test="PartType != null and PartType != ''">
+						and PartType like  '%'+#{PartType} +'%'
+					</if>
+					<if test="Address != null and Address != ''">
+						and Address =#{Address}
+					</if>
+					order by CreateTime	
+	</select>
+	
+	<select id="getPartListAllC" parameterType="pd" resultType="pd">
+		
+					select count(*) as AllC from t_part z1 
+					where DR=0	and (z1.trayId = null or z1.trayId = '') and CreateTime is not null
+					<if test="State != null and State != ''">
+						and State = #{State} 
+					</if>
+					<if test="PartType != null and PartType != ''">
+						and PartType like  '%'+#{PartType} +'%'
+					</if>
+					<if test="Address != null and Address != ''">
+						and Address =#{Address}
+					</if>
+	</select>
+	
+	
+	<select id="getPartListBangDing" parameterType="pd" resultType="pd">
+		
+					select 
+					<if test="FullNumber != null and FullNumber != ''">
+						top ${FullNumber} 
+					</if>
+					 * from t_part z1 
+					where DR=0	and (z1.trayId = null or z1.trayId = '') and CreateTime is not null
+					<if test="State != null and State != ''">
+						and State = #{State} 
+					</if>
+					<if test="PartType != null and PartType != ''">
+						and PartType like  '%'+#{PartType} +'%'
+					</if>
+					<if test="Address != null and Address != ''">
+						and Address =#{Address}
+					</if>
+					order by CreateTime	
+	</select>
+	<!-- 校验重复 -->
+	<select id="findRepeatCount" parameterType="pd" resultType="pd">
+		select top 1
+			ID
+		from 
+			t_part
+		where 
+			DR=0
+			
+		<if test="PartName != null and PartName != ''">
+			and PartName = #{PartName} 
+		</if>
+		<if test="QRCode != null and QRCode != ''">
+			and QRCode = #{QRCode} 
+		</if>
+	</select>
+	
+	<!-- 根据托盘Id查询已经绑定的零件 -->
+	<select id="getPartListByTrayId" parameterType="pd" resultType="pd">
+		select * 
+		from 
+			t_part
+		where 
+			DR=0			
+		and TrayId = #{TrayId}
+	</select>
+	
+	<!-- 删除 -->
+	<update id="delete" parameterType="pd">
+			update  t_part set			
+			DeleteTime=#{DeleteTime},
+			DeleteUser=#{DeleteUser},
+			DR=1			
+			where ID = #{ID}
+	</update>
+	
+	<!-- 变更选中箱子ID下所有的零件状态为已使用-->
+	<update id="updatePartStateByPartId" parameterType="pd">
+			update t_part
+				set State = #{State},
+				UpdateTime=#{UpdateTime},
+				UseAddress=#{UseAddress},
+			    UpdateUser=#{UpdateUser},
+				where id = #{partId}
+	</update>
+	
+	<!-- 变更选中托盘ID下所有的零件状态为已使用-->
+	<update id="updatePartStateByTrayId" parameterType="pd">
+			update t_part
+				set State = #{State},
+				    TrayId = #{TrayId},
+				    PartType = #{PartType},
+				    DR = 0
+				where id = #{PartId}
+	</update>
+	
+	<update id="updatePartStateByTrayIdBangDing" parameterType="pd">
+			update t_part
+				set 
+					Sclass= #{Sclass}
+					<if test="TrayId != null and TrayId != ''">
+						,TrayId = #{TrayId}
+					</if>
+				where id = #{ID}
+	</update>
+	
+	<!-- 删除 -->
+	<delete id="deletePartData" parameterType="pd">
+			delete  t_part where ID = #{ID}
+	</delete>
+</mapper>

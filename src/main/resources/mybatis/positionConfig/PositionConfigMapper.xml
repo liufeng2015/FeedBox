@@ -1,0 +1,120 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+	"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="PositionConfigMapper">
+	
+	<!-- 修改 -->
+	<update id="edit" parameterType="pd">
+		update  t_config
+			set PositionCode    = #{PositionCode},
+				PositionInfo    = #{PositionInfo},
+				IP = #{IP},
+			    PORT = #{PORT},
+				State    = #{State},
+				FullState = #{FullState},
+			    EmptyState = #{EmptyState},
+			    CanUseState = #{CanUseState},
+			    DurtyState = #{DurtyState},
+			    Led = #{Led},
+			    AlertLight = #{AlertLight},
+			    Address = #{Address},
+				UpdateTime  = #{UpdateTime},
+				UpdateUser  = #{UpdateUser},
+				TrayType	=#{TrayType},
+				EP=#{EP}		
+			where 
+				ID = #{ID}
+	</update>
+	
+	<!-- 通过id获取数据 -->
+	<select id="findById" parameterType="pd" resultType="pd">
+		select *
+		from 
+			t_config
+		where 
+			ID = #{ID}
+	</select>
+	
+	<!-- 通过名称获取数据 -->
+	<select id="findByName" parameterType="pd" resultType="pd">
+		select *
+		from 
+			t_config
+		where 
+			PositionInfo = #{PositionInfo}
+	</select>
+	
+	<!-- 新增 -->
+	<insert id="save" parameterType="pd">
+		insert into t_config (
+			ID,
+			IP,
+			PORT,
+			PositionCode,
+			PositionInfo,
+			State,
+			FullState,
+			EmptyState,
+			CanUseState,
+			DurtyState,
+			Led,
+			AlertLight,
+			Address,
+			DR,
+			CreateTime,
+			CreateUser,
+			TrayType,
+			EP
+		) values (
+			#{ID},
+			#{IP},
+			#{PORT},
+			#{PositionCode},
+			#{PositionInfo},
+			#{State},
+			#{FullState},
+			#{EmptyState},
+			#{CanUseState},
+			#{DurtyState},
+			#{Led},
+			#{AlertLight},
+			#{Address},
+			0,
+			#{CreateTime},
+			#{CreateUser},
+			#{TrayType},
+			#{EP}
+		)
+	</insert>
+	
+	<!-- 列表 -->
+	<select id="dictlistPage" parameterType="page" resultType="pd">
+		 select * FROM (  
+					select ROW_NUMBER()Over(order by z1.CreateTime desc) as rowId, * from t_config z1 
+					where DR=0			
+					    <if test="pd.FuzzySearch != null and pd.FuzzySearch != ''">
+							and (
+									PositionInfo like '%'+#{pd.FuzzySearch} +'%' 							
+							)
+						</if>
+				)as mytable  where 1=1  
+	</select>
+
+	<!-- 获取所有配置列表信息 -->
+	<select id="getAllList" parameterType="page" resultType="pd">
+		 select * FROM (  
+					select ROW_NUMBER()Over(order by z1.CreateTime desc) as rowId, * from t_config z1 
+					where DR=0			
+				)as mytable  where 1=1  
+	</select>
+	
+	<!-- 删除 -->
+	<update id="delete" parameterType="pd">
+			update  t_config set			
+			DeleteTime=#{DeleteTime},
+			DeleteUser=#{DeleteUser},
+			DR=1			
+			where ID = #{ID}
+	</update>
+	
+</mapper>

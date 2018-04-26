@@ -1,0 +1,133 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+	"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="BoxPartRelInfoMapper">
+	
+	<!-- 新增 -->
+	<insert id="save" parameterType="pd">
+		insert into t_boxPartRel (
+		    ID,
+		    PartId,
+			PartQRCode,
+			BoxQRCode,
+			BoxId,
+			State,
+			DR,
+			CreateTime,
+			CreateUser
+		) values (
+			#{ID},
+			#{PartId},
+			#{PartQRCode},
+			#{BoxQRCode},
+			#{BoxId},
+			#{State},
+			0,
+			#{CreateTime},
+			#{CreateUser}
+		)
+	</insert>
+	
+	<!-- 列表1：查询已选中的零件列表 -->
+	<select id="dictChooselistPage" parameterType="page" resultType="pd">
+		 SELECT
+			*
+		FROM
+			(
+				SELECT
+					ROW_NUMBER () OVER (ORDER BY t1.CreateTime DESC) AS rowId,
+					t3.ID AS BoxId,
+					t3.QRCode as BoxQRCode,
+					t3.BoxName,
+					t1.ID AS PartId,
+					t1.QRCode,
+					t1.PartName,
+					t1.PartType,
+					t1.PlantNumber,
+					t1.PartDate,
+					t1.AssemblyNumber,
+					t1.PlantStructure,
+					t1.State,
+					t1.RowNumber,
+					t1.GroupNumber,
+					t1.DateNumber,
+					t1.LineNumber,
+					t1.VMNumber,
+					t1.SerialNumber,
+					t2.ID
+				FROM
+					t_part t1
+				LEFT JOIN t_boxPartRel t2 ON t1.ID = t2.PartId
+				AND t2.DR = 0
+				LEFT JOIN t_box t3 ON t2.BoxId = t3.ID
+				AND t3.DR = 0
+				WHERE
+					t1.DR = 0
+			<if test="pd.BoxName != null and pd.BoxName != ''">
+				and t3.BoxName like '%'+#{pd.BoxName} +'%'
+			</if>
+			<if test="pd.BoxId != null and pd.BoxId != ''">
+				and t3.ID = #{pd.BoxId} 
+			</if>
+			<if test="pd.BoxQRCode != null and pd.BoxQRCode != ''">
+				and t3.QRCode = #{pd.BoxQRCode} 
+			</if>
+			<if test="pd.PartQRCode != null and pd.PartQRCode != ''">
+				and t1.QRCode = #{pd.PartQRCode} 
+			</if>
+         )as mytable  where 1=1  
+	</select>
+	
+	<!-- 列表2:查询未选中的零件列表 -->
+	<select id="dictNoChooselistPage" parameterType="page" resultType="pd">
+		 select * FROM (  
+			SELECT
+				ROW_NUMBER () OVER (ORDER BY t1.CreateTime DESC) AS rowId,
+				t1.*
+			FROM
+				t_part t1
+			WHERE t1.DR = 0
+			and t1.ID NOT IN (
+							SELECT
+								t2.PartId
+							FROM
+								t_boxPartRel t2	
+							WHERE t2.DR = 0
+						)
+         )as mytable  where 1=1  
+	</select>
+	
+	<!-- 列表(全部) -->
+	<select id="listAll" parameterType="pd" resultType="pd">
+		select
+				a.*
+		from 
+				t_boxPartRel a
+		where a.DR = 0
+		<if test="BoxId != null and BoxId != ''">
+			and a.BoxId = #{BoxId} 
+		</if>
+		<if test="PartId != null and PartId != ''">
+			and a.PartId = #{PartId} 
+		</if>
+	</select>
+	
+	<!-- 删除 -->
+	<!-- <update id="delete" parameterType="pd">
+			update  t_boxPartRel set			
+			DeleteTime=#{DeleteTime},
+			DeleteUser=#{DeleteUser},
+			DR=1,
+			State = 1	
+			where ID = #{ID}
+	</update> -->
+	<delete id="delete" parameterType="pd">
+		delete from t_boxPartRel		
+		<if test="ID != null and ID != ''">
+			where ID = #{ID}
+		</if>
+		<if test="BoxId != null and BoxId != ''">
+			where BoxId = #{BoxId}
+		</if>
+	</delete>	
+</mapper>

@@ -1,0 +1,148 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+	"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="NoticeMapper">
+	
+	<!-- 新增 -->
+	<insert id="save" parameterType="pd">
+		insert into t_notice (
+			    title ,
+				content,
+				authorId,
+				author,
+				deptId,
+				dept,
+				isInvalid,
+				publishTime,
+				fileContent,
+				filename,
+				filenamepath,
+				createDate,
+				dr
+		) values (
+			    #{title},
+				#{content},
+				#{authorId},
+				#{author},
+				#{deptId},
+				#{dept},
+				#{isInvalid},
+				#{publishTime},
+				#{fileContent},
+				#{filename},
+				#{filenamepath},
+				#{createDate},
+				0
+		)
+	</insert>
+	
+	<!-- 修改 -->
+	<update id="edit" parameterType="pd">
+		update  t_notice
+			set 
+			<if test="title!=null and title!=''">
+			             title = #{title},
+		     </if>
+		     <if test="content!=null and content!=''">
+			             content = #{content},
+		     </if>
+		     <if test="authorId!=null and authorId!=''">
+			             authorId = #{authorId},
+		     </if>
+		     <if test="author!=null and author!=''">
+			             author = #{author},
+		     </if>
+		     <if test="deptId!=null and deptId!=''">
+			             deptId = #{deptId},
+		     </if>
+		     <if test="dept!=null and dept!=''">
+			             dept = #{dept},
+		     </if>
+		     <if test="isInvalid!=null and isInvalid!=''">
+			             isInvalid = #{isInvalid},
+		     </if>
+		     <if test="publishTime!=null and publishTime!=''">
+			             publishTime = #{publishTime},
+		     </if>
+		     <if test="fileContent!=null and fileContent!=''">
+			             fileContent = #{fileContent},
+		     </if>
+		     <if test="filename!=null and filename!=''">
+			             filename = #{filename},
+		     </if>
+		     <if test="filenamepath!=null and filenamepath!=''">
+			             filenamepath = #{filenamepath},
+		     </if>
+				updateDate = #{updateDate},
+				dr = #{dr}
+			where 
+				id = #{id}
+	</update>
+	
+	<!-- 通过id获取数据 -->
+	<select id="findById" parameterType="pd" resultType="pd">
+		select 
+			*
+		from 
+			t_notice
+		where 
+		   dr = 0
+		and   
+		  id = #{id}
+	</select>
+	
+	
+	<!-- 列表 -->
+	<select id="dictlistPage" parameterType="page" resultType="pd">
+		  select * FROM (  
+					select ROW_NUMBER()Over(order by z1.createDate desc) as rowId, * from t_notice z1 
+					where z1.dr = 0 
+					<if test="pd.isInvalid!=null and pd.isInvalid!=''">
+			             and z1.isInvalid = #{pd.isInvalid}
+		             </if>
+		             
+		             <if test="pd.title!=null and pd.title!=''">
+			             and z1.title like '%'+ #{pd.title} +'%' 
+		             </if>
+				)as mytable  where 1=1 
+	</select>
+	
+	<!-- 查询总数 -->
+	<select id="findCount" parameterType="pd" resultType="pd">
+		select 
+			count(id) ZS
+		from 
+			t_notice
+		where 
+			id = #{id}
+	</select>
+	
+	
+	<!-- 删除-->
+	<delete id="delete" parameterType="pd">
+		update  t_notice 
+		set 
+		     deleteDate = #{deleteDate},
+		     dr = 1
+		where 
+			id = #{id}
+	</delete>
+	
+	<!-- 删除文件-->
+	<delete id="delFile" parameterType="pd">
+		update  t_notice 
+		set 
+		    filename = '',
+			filenamepath = ''
+		where 
+			id = #{id}
+	</delete>
+	
+	<!-- 彻底删除-->
+	<delete id="thoroughDelete" parameterType="pd">
+		delete from t_notice 
+		where 
+			id = #{id}
+	</delete>
+	
+</mapper>

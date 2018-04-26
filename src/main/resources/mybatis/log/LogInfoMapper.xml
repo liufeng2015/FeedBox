@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+	"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="LogInfoMapper">
+	<!-- 列表 -->
+	<select id="dictlistPage" parameterType="page" resultType="pd">
+		 select * FROM (  
+			select ROW_NUMBER()Over(order by z1.CreateTime desc) as rowId, * from t_logInfo z1 
+				where 1=1		
+			<if test="pd.FuzzySearch != null and pd.FuzzySearch != ''">
+				and (
+					INFO like '%'+#{pd.FuzzySearch} +'%' 							
+				)
+			</if>
+			<if test="pd.trayId != null and pd.trayId != ''">
+				and (
+					trayId = #{pd.trayId} 							
+				)
+			</if>
+			)as mytable  where 1=1  
+	</select>
+	
+	<!-- 写LOG -->
+	<insert id="saveLogInfo" parameterType="pd">
+		insert into t_logInfo (
+			LOGID,
+			INFO,
+			TYPE,
+			STATE,
+			ADDRESS,
+			CreateTime,
+			CreateUser,
+			trayId
+		) values (
+			#{LOGID},
+			#{INFO},
+			#{TYPE},
+			#{STATE},
+			#{ADDRESS},
+			#{CreateTime},
+			#{CreateUser},
+			#{trayId}
+			
+		)
+	</insert>
+	
+	
+</mapper>

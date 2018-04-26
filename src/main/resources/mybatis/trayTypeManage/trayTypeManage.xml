@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+	"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="TrayTypeManageMapper">	
+	<!-- 新增 -->
+	<insert id="save" parameterType="pd">
+		insert into tray_type_manage (
+		    tray_id,
+		    tray_type,
+			onoff,
+			alert_color,
+			tray_name,
+			alarm_time_s,
+			alarm_time_e		
+		) values (
+			#{TrayId},
+			#{TrayType},
+			#{onoff},
+			#{alertColor},
+			#{alarmTimeS},
+			#{alarmTimeE}			
+		)
+	
+	</insert>	
+	<update id="edit" parameterType="pd" flushCache="false">
+		update tray_type_manage set 
+		tray_type = #{tray_type},
+		onoff=#{onoff},
+		alert_color=#{alert_color},
+		tray_name=#{tray_name},
+		alarm_time_s=#{alarm_time_s},
+		alarm_time_e=#{alarm_time_e}
+		where tray_id = #{tray_id}
+	</update>
+	<!-- 查询数量-->
+	<select id="getTrayTypeList" parameterType="pd" resultType="pd">
+		 SELECT
+		  	tray_id,
+		    tray_type,
+			onoff,
+			alert_color,
+			tray_name,
+			alarm_time_s,
+			alarm_time_e	
+		FROM		
+			tray_type_manage
+		WHERE
+			1=1
+		<if test="pd.tray_name != null and pd.tray_name != ''">
+			and tray_name like '%${pd.tray_name}%'
+		</if>		
+	</select>	
+	<delete id="delete" parameterType="pd" flushCache="false">
+		delete from tray_type_manage
+		where 
+			tray_id = #{tray_id}
+	</delete>
+</mapper>

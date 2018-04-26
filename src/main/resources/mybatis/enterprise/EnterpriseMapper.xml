@@ -1,0 +1,357 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+	"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="EnterpriseMapper">
+			
+			
+	
+	<!-- 修改 -->
+	<update id="edit" parameterType="pd">
+				
+		UPDATE t_enterprise
+		   SET
+		      Name =#{Name}
+		      ,LegalRepresentative = #{LegalRepresentative}
+		      ,RegisteredAddress = #{RegisteredAddress}
+		      ,EstablishmentTime = #{EstablishmentTime}
+		      ,UniformCreditCode = #{UniformCreditCode}
+		      ,RegisteredCapital = #{RegisteredCapital}
+		      ,BusinessAddress = #{BusinessAddress}
+		      	,Origin	= #{Origin}
+				,Telephone	= #{Telephone}
+				,Phone	= #{Phone}
+				,CommonAddress= #{CommonAddress}	
+				,Email	= #{Email}
+				,Nature	= #{Nature}
+				,IsAbnormalOperation= #{IsAbnormalOperation}	
+				,MainBusiness	= #{MainBusiness}
+				,Industry	= #{Industry}
+				,TotalInvestment= #{TotalInvestment}		
+				,OutputValue		= #{OutputValue}
+				,TaxRevenue		= #{TaxRevenue}
+				,ListingSituation	= #{ListingSituation}
+				,AreaCovered		= #{AreaCovered}
+				,BuiltArea		= #{BuiltArea}
+				,UnBuiltArea		= #{UnBuiltArea}
+				,WorkshopArea		= #{WorkshopArea}
+				,FactoryArea		= #{FactoryArea}
+				,SpareArea		= #{SpareArea}
+				,ResidualArea	= #{ResidualArea}
+				,ElectricityConsumption= #{ElectricityConsumption}		
+				,PowerhouseStructure	= #{PowerhouseStructure}
+				,PowerhouseSource	= #{PowerhouseSource}
+				,IsSell	= #{IsSell}
+				,Obligation	= #{Obligation}
+				,Contacts	= #{Contacts}
+				,NatureLand	= #{NatureLand}
+				,VolumeRatio	= #{VolumeRatio}	
+				,TotalNumber		= #{TotalNumber}
+				,LocalNumber		= #{LocalNumber}
+				,ExternalNumber		= #{ExternalNumber}
+				,IsLabourUnion	= #{IsLabourUnion}
+				,IsPartyBranch	= #{IsPartyBranch}
+				,PartyMembership	= #{PartyMembership}	
+				,IsSpecialEquipment	= #{IsSpecialEquipment}
+				,SpecialEquipmentNumber	= #{SpecialEquipmentNumber}
+				,SafeProductionLicense	= #{SafeProductionLicense}
+				,SafeProductionNumber	= #{SafeProductionNumber}
+				,CertificateValidity		= #{CertificateValidity}
+				,TransactionManagement	= #{TransactionManagement}
+				,TransactionManagementPhone	= #{TransactionManagementPhone}
+				,TransactionManagementQQ	= #{TransactionManagementQQ}
+				,SecurityManagement	= #{SecurityManagement}
+				,SecurityManagementPhone= #{SecurityManagementPhone}	
+				,SecurityManagementQQ	= #{SecurityManagementQQ}
+				,SecurityManagementTrain	= #{SecurityManagementTrain}
+				,SecurityManagementValidity		= #{SecurityManagementValidity}
+				,IsEia	= #{IsEia}
+				,EnvironmentalApprovals= #{EnvironmentalApprovals}	
+				,SpecialWork	= #{SpecialWork}
+				,SpecialWorkNumber	= #{SpecialWorkNumber}	
+				,IsHazardousEnterprise	= #{IsHazardousEnterprise}
+				,IsStandardize	= #{IsStandardize}
+				,EnergyMode	= #{EnergyMode}
+				,DrainageMethod	= #{DrainageMethod}
+		      ,UpdateTime = #{UpdateTime}
+		      ,UpdateUser = #{UpdateUser}
+		      
+		      
+		 WHERE 
+		 	 E_ID = #{E_ID}
+
+	</update>
+	
+	<!-- 通过id获取数据 -->
+	<select id="findById" parameterType="pd" resultType="pd">
+		select *
+		from 
+			t_enterprise
+		where 
+			 E_ID = #{E_ID}
+	</select>
+	
+	<!-- 新增 -->
+	<insert id="save" parameterType="pd">
+		insert into t_enterprise (
+			E_ID
+           ,Name
+           ,LegalRepresentative
+           ,RegisteredAddress
+           ,EstablishmentTime
+           ,UniformCreditCode
+           ,RegisteredCapital
+           ,BusinessAddress
+				,Origin
+				,Telephone
+				,Phone
+				,CommonAddress	
+				,Email
+				,Nature
+				,IsAbnormalOperation
+				,MainBusiness
+				,Industry	
+				,TotalInvestment		
+				,OutputValue
+				,TaxRevenue
+				,ListingSituation
+				,AreaCovered
+				,BuiltArea
+				,UnBuiltArea
+				,WorkshopArea
+				,FactoryArea
+				,SpareArea
+				,ResidualArea
+				,ElectricityConsumption		
+				,PowerhouseStructure
+				,PowerhouseSource
+				,IsSell
+				,Obligation
+				,Contacts
+				,NatureLand
+				,VolumeRatio	
+				,TotalNumber
+				,LocalNumber
+				,ExternalNumber
+				,IsLabourUnion
+				,IsPartyBranch
+				,PartyMembership	
+				,IsSpecialEquipment
+				,SpecialEquipmentNumber
+				,SafeProductionLicense
+				,SafeProductionNumber
+				,CertificateValidity
+				,TransactionManagement
+				,TransactionManagementPhone
+				,TransactionManagementQQ
+				,SecurityManagement
+				,SecurityManagementPhone	
+				,SecurityManagementQQ
+				,SecurityManagementTrain
+				,SecurityManagementValidity
+				,IsEia
+				,EnvironmentalApprovals
+				,SpecialWork
+				,SpecialWorkNumber	
+				,IsHazardousEnterprise
+				,IsStandardize
+				,EnergyMode
+				,DrainageMethod
+           ,CreateTime
+           ,CreateUser
+           ,DR
+		) values (
+			#{E_ID},
+			#{Name},
+			#{LegalRepresentative},
+			#{RegisteredAddress},
+			#{EstablishmentTime},
+			#{UniformCreditCode},
+			#{RegisteredCapital},
+			#{BusinessAddress},
+				#{Origin},
+				#{Telephone},
+				#{Phone},
+				#{CommonAddress},	
+				#{Email},
+				#{Nature},
+				#{IsAbnormalOperation},	
+				#{MainBusiness},
+				#{Industry},
+				#{TotalInvestment},		
+				#{OutputValue},
+				#{TaxRevenue},
+				#{ListingSituation},
+				#{AreaCovered},
+				#{BuiltArea},
+				#{UnBuiltArea},
+				#{WorkshopArea},
+				#{FactoryArea},
+				#{SpareArea},
+				#{ResidualArea},
+				#{ElectricityConsumption},		
+				#{PowerhouseStructure},
+				#{PowerhouseSource},
+				#{IsSell},
+				#{Obligation},
+				#{Contacts},
+				#{NatureLand},
+				#{VolumeRatio},	
+				#{TotalNumber},
+				#{LocalNumber},
+				#{ExternalNumber},
+				#{IsLabourUnion},
+				#{IsPartyBranch},
+				#{PartyMembership},	
+				#{IsSpecialEquipment},
+				#{SpecialEquipmentNumber},
+				#{SafeProductionLicense},
+				#{SafeProductionNumber},
+				#{CertificateValidity},
+				#{TransactionManagement},
+				#{TransactionManagementPhone},
+				#{TransactionManagementQQ},
+				#{SecurityManagement},
+				#{SecurityManagementPhone},	
+				#{SecurityManagementQQ},
+				#{SecurityManagementTrain},
+				#{SecurityManagementValidity},
+				#{IsEia},
+				#{EnvironmentalApprovals},	
+				#{SpecialWork},
+				#{SpecialWorkNumber},	
+				#{IsHazardousEnterprise},
+				#{IsStandardize},
+				#{EnergyMode},
+				#{DrainageMethod},
+			
+			
+			
+			#{CreateTime},
+			#{CreateUser},
+			0
+		)
+	</insert>
+	
+	<!-- 列表 -->
+	<select id="dictlistPage" parameterType="page" resultType="pd">
+		 select * FROM (  
+					select ROW_NUMBER()Over(order by z1.CreateTime desc) as rowId, * from t_enterprise z1 
+					where z1.DR = 0
+						<if test="pd.FuzzySearch != null and pd.FuzzySearch != ''">
+							and (
+									Name like '%'+#{pd.FuzzySearch} +'%' or 
+									LegalRepresentative like '%'+#{pd.FuzzySearch} +'%' or
+									RegisteredAddress like '%'+#{pd.FuzzySearch} +'%' or
+									EstablishmentTime like '%'+#{pd.FuzzySearch} +'%' or
+									UniformCreditCode like '%'+#{pd.FuzzySearch} +'%' or
+									RegisteredCapital like '%'+#{pd.FuzzySearch} +'%' or
+									BusinessAddress like '%'+#{pd.FuzzySearch} +'%' or
+									Origin like '%'+#{pd.FuzzySearch} +'%' or
+									Telephone like '%'+#{pd.FuzzySearch} +'%' or
+									Phone like '%'+#{pd.FuzzySearch} +'%' or
+									CommonAddress	like '%'+#{pd.FuzzySearch} +'%' or
+									Email like '%'+#{pd.FuzzySearch} +'%' or
+									Nature like '%'+#{pd.FuzzySearch} +'%' or
+									IsAbnormalOperation like '%'+#{pd.FuzzySearch} +'%' or
+									MainBusiness like '%'+#{pd.FuzzySearch} +'%' or
+									Industry	like '%'+#{pd.FuzzySearch} +'%' or
+									TotalInvestment like '%'+#{pd.FuzzySearch} +'%' or
+									OutputValue like '%'+#{pd.FuzzySearch} +'%' or
+									TaxRevenue like '%'+#{pd.FuzzySearch} +'%' or
+									ListingSituation like '%'+#{pd.FuzzySearch} +'%' or
+									AreaCovered like '%'+#{pd.FuzzySearch} +'%' or
+									BuiltArea like '%'+#{pd.FuzzySearch} +'%' or
+									UnBuiltArea like '%'+#{pd.FuzzySearch} +'%' or
+									WorkshopArea like '%'+#{pd.FuzzySearch} +'%' or
+									FactoryArea like '%'+#{pd.FuzzySearch} +'%' or
+									SpareArea like '%'+#{pd.FuzzySearch} +'%' or
+									ResidualArea like '%'+#{pd.FuzzySearch} +'%' or
+									ElectricityConsumption	like '%'+#{pd.FuzzySearch} +'%' or
+									PowerhouseStructure like '%'+#{pd.FuzzySearch} +'%' or
+									PowerhouseSource like '%'+#{pd.FuzzySearch} +'%' or
+									IsSell like '%'+#{pd.FuzzySearch} +'%' or
+									Obligation like '%'+#{pd.FuzzySearch} +'%' or
+									Contacts like '%'+#{pd.FuzzySearch} +'%' or
+									NatureLand like '%'+#{pd.FuzzySearch} +'%' or
+									VolumeRatio like '%'+#{pd.FuzzySearch} +'%' or
+									TotalNumber like '%'+#{pd.FuzzySearch} +'%' or
+									LocalNumber like '%'+#{pd.FuzzySearch} +'%' or
+									ExternalNumber like '%'+#{pd.FuzzySearch} +'%' or
+									IsLabourUnion like '%'+#{pd.FuzzySearch} +'%' or
+									IsPartyBranch like '%'+#{pd.FuzzySearch} +'%' or
+									PartyMembership like '%'+#{pd.FuzzySearch} +'%' or
+									IsSpecialEquipment like '%'+#{pd.FuzzySearch} +'%' or
+									SpecialEquipmentNumber like '%'+#{pd.FuzzySearch} +'%' or
+									SafeProductionLicense like '%'+#{pd.FuzzySearch} +'%' or
+									SafeProductionNumber like '%'+#{pd.FuzzySearch} +'%' or
+									CertificateValidity like '%'+#{pd.FuzzySearch} +'%' or
+									TransactionManagement like '%'+#{pd.FuzzySearch} +'%' or
+									TransactionManagementPhone like '%'+#{pd.FuzzySearch} +'%' or
+									TransactionManagementQQ like '%'+#{pd.FuzzySearch} +'%' or
+									SecurityManagement like '%'+#{pd.FuzzySearch} +'%' or
+									SecurityManagementPhone like '%'+#{pd.FuzzySearch} +'%' or
+									SecurityManagementQQ like '%'+#{pd.FuzzySearch} +'%' or
+									SecurityManagementTrain like '%'+#{pd.FuzzySearch} +'%' or
+									SecurityManagementValidity like '%'+#{pd.FuzzySearch} +'%' or
+									IsEia like '%'+#{pd.FuzzySearch} +'%' or
+									EnvironmentalApprovals like '%'+#{pd.FuzzySearch} +'%' or
+									SpecialWork like '%'+#{pd.FuzzySearch} +'%' or
+									SpecialWorkNumber like '%'+#{pd.FuzzySearch} +'%' or
+									IsHazardousEnterprise like '%'+#{pd.FuzzySearch} +'%' or
+									IsStandardize like '%'+#{pd.FuzzySearch} +'%' or
+									EnergyMode like '%'+#{pd.FuzzySearch} +'%' or
+									DrainageMethod like '%'+#{pd.FuzzySearch} +'%' 
+							)
+						</if>
+					        
+				)as mytable  where 1=1 
+	</select>
+	
+	<select id="getIdAndName" resultType="pd">
+		 select E_ID,Name FROM t_enterprise z1 
+					where z1.DR = 0
+	</select>
+	
+	<select id="dictlistPageByIdAndName" parameterType="page" resultType="pd">
+		 select E_ID,Name FROM (  
+					select ROW_NUMBER()Over(order by z1.CreateTime desc) as rowId, E_ID,Name from t_enterprise z1 
+					where z1.DR = 0 and E_ID not in(select E_ID from t_newsPush where N_ID = #{pd.N_ID})
+						<if test="pd.FuzzySearch != null and pd.FuzzySearch != ''">
+							and (
+									Name like '%'+#{pd.FuzzySearch} +'%'  
+									
+							)
+						</if>
+					        
+				)as mytable  where 1=1 
+	</select>
+	
+	<select id="dictlistPageByEnterpriseTax" parameterType="page" resultType="pd">
+		 select * FROM (  
+					select ROW_NUMBER()Over(order by cast(z1.TaxRevenue as float) desc) as rowId, z1.* from t_enterprise z1 
+					where z1.DR = 0 		        
+				)as mytable  where 1=1 
+	</select>
+	
+	<select id="dictlistPageByEnterpriseOutputValue" parameterType="page" resultType="pd">
+		 select * FROM (  
+					select ROW_NUMBER()Over(order by cast(z1.OutputValue as float) desc) as rowId, z1.* from t_enterprise z1 
+					where z1.DR = 0 		        
+				)as mytable  where 1=1 
+	</select>
+	
+	
+	
+	
+	<update id="delete" parameterType="pd">
+			update  t_enterprise set 
+			
+			DeleteTime=#{DeleteTime},
+			DeleteUser=#{DeleteUser},
+			DR=1 
+			
+			where E_ID = #{E_ID}
+	</update>
+	
+	
+</mapper>

@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+	"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="PrintTrayPartInfoMapper">
+
+	<!-- 列表 -->
+	<select id="dictlistPage" parameterType="page" resultType="pd">
+		 select * FROM (  
+			SELECT
+				ROW_NUMBER () OVER (ORDER BY t1.CreateTime DESC) AS rowId,
+				t2.TrayName,
+				t2.TrayType,
+				t2.ROW,
+				t2.Address,
+				t1.TrayId,
+				COUNT (t1.partId) AS PartNum
+			FROM
+				t_printTrayPart t1
+			LEFT JOIN t_tray t2 ON t1.TrayId = t2.ID
+			AND t2.DR = 0
+			WHERE
+				1 = 1
+			GROUP BY
+				t1.CreateTime,
+				t2.TrayName,
+				t2.TrayType,
+				t2.Address,
+				t2.ROW,
+				t1.TrayId
+		)as mytable  where 1=1  
+	</select>
+</mapper>

@@ -1,0 +1,465 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+	"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="TongJiInfoMapper">
+	
+	<!-- 列表 -->
+	<select id="getTrayList" parameterType="pd" resultType="pd">
+		  
+		 select TrayType,count(*)as cou,COUNT (
+				CASE
+				WHEN EP ='EPA1' THEN
+					'EPA1'
+				END
+			) AS EPA1,
+			COUNT (
+				case
+				WHEN EP ='EPA3' THEN
+					'EPA3'
+				END
+			) AS EPA3
+		from t_tray t,sys_dictionaries s where DR=0 and t.TrayType=s.BIANMA  group by TrayType,s.ORDY_BY order by s.ORDY_BY
+	</select>
+	
+	<!-- 查询数量-->
+	<select id="getStateCountList" parameterType="pd" resultType="pd">
+		 SELECT
+			Address,
+			COUNT (
+				CASE
+				WHEN State = '满箱' THEN
+					'满箱'
+				END
+			) AS FullNum,
+			COUNT (
+				CASE
+				WHEN State = '空箱' or State LIKE '%可使用空箱%' THEN
+					'空箱'
+				END
+			) AS EmptyNum,
+			COUNT (
+				CASE
+				WHEN State LIKE '%待清洗%' THEN
+					'待清洗'
+				END
+			) AS CleanNum,
+			COUNT (
+				CASE
+				WHEN State LIKE '%可使用空箱%' THEN
+					'可使用空箱'
+				END
+			) AS UseNum
+		FROM
+			t_tray
+		WHERE
+			dr = 0
+		<if test="pd.TrayType != null and pd.TrayType != ''">
+			and TrayType =#{pd.TrayType}
+		</if>
+		<if test="pd.EP != null and pd.EP != ''">
+			and EP =#{pd.EP}
+		</if>
+		AND Address IS NOT NULL
+		and Address &lt;&gt;''
+		GROUP BY
+			Address
+	</select>
+	
+	
+	<select id="getPartState" parameterType="pd" resultType="pd">
+		select Address ,PartName,count(*) as upNum ,(select COUNT(*) from t_part where Address=p.Address and PartName=p.PartName and State='已使用' and dr=0 
+		<if test="pd.startTime != null and pd.startTime != ''">
+			and CreateTime&gt;#{pd.startTime} 
+		</if>
+		
+		<if test="pd.endTime != null and pd.endTime != ''">
+			and CreateTime &lt;#{pd.endTime} 
+		</if>
+		) as useNum from t_part p where 
+		 DR=0 
+		
+		<if test="pd.startTime != null and pd.startTime != ''">
+			and CreateTime&gt;#{pd.startTime} 
+		</if>
+		
+		<if test="pd.endTime != null and pd.endTime != ''">
+			and CreateTime &lt;#{pd.endTime} 
+		</if>
+		group by Address,PartName
+	</select>
+	
+	<select id="getPartTJ" parameterType="pd" resultType="pd">
+		
+
+			select PartName,COUNT(*) as cou from t_part t,sys_dictionaries s where DR=0 and t.PartName=s.BIANMA  
+			<if test="pd.startTime != null and pd.startTime != ''">
+				and CreateTime&gt;#{pd.startTime} 
+			</if>
+		
+			<if test="pd.endTime != null and pd.endTime != ''">
+				and CreateTime &lt;#{pd.endTime} 
+			</if> 
+			
+			<if test="pd.PartName != null and pd.PartName != ''">
+				and PartName=#{pd.PartName} 
+			</if> 
+			group by PartName ,s.ORDY_BY order by s.ORDY_BY
+	</select>
+	
+	<select id="getPartSX" parameterType="pd" resultType="pd">
+		
+
+			select PartName,COUNT(*) as cou,COUNT (
+				CASE
+				WHEN UseAddress like 'EP1%' THEN
+					'EPA1'
+				END
+			) AS EPA1,
+			COUNT (
+				case
+				WHEN UseAddress like 'EP3%' THEN
+					'EPA3'
+				END
+			) AS EPA3 from t_part t,sys_dictionaries s where DR=0 and t.PartName=s.BIANMA  
+			<if test="pd.startTime != null and pd.startTime != ''">
+				and UseTime&gt;#{pd.startTime} 
+			</if>
+		
+			<if test="pd.endTime != null and pd.endTime != ''">
+				and UseTime &lt;#{pd.endTime} 
+			</if> 
+			
+			<if test="pd.PartName != null and pd.PartName != ''">
+				and PartName=#{pd.PartName} 
+			</if> 
+			and state='已使用'
+			group by PartName ,s.ORDY_BY order by s.ORDY_BY
+	</select>
+	
+	<select id="getPartXX" parameterType="pd" resultType="pd">
+		
+
+			select PartName,COUNT(*) as cou,COUNT (
+				CASE
+				WHEN EP ='EPA1' THEN
+					'EPA1'
+				END
+			) AS EPA1,
+			COUNT (
+				case
+				WHEN EP ='EPA3' THEN
+					'EPA3'
+				END
+			) AS EPA3 from t_part t,sys_dictionaries s where DR=0 and t.PartName=s.BIANMA 
+			<if test="pd.startTime != null and pd.startTime != ''">
+				and CreateTime&gt;#{pd.startTime} 
+			</if>
+		
+			<if test="pd.endTime != null and pd.endTime != ''">
+				and CreateTime &lt;#{pd.endTime} 
+			</if> 
+			
+			<if test="pd.PartName != null and pd.PartName != ''">
+				and PartName=#{pd.PartName} 
+			</if> 
+			group by PartName ,s.ORDY_BY order by s.ORDY_BY
+	</select>
+	
+	<select id="getPartXXGT" parameterType="pd" resultType="pd">
+		select PartName,COUNT(*) as cou,COUNT (
+				CASE
+				WHEN EP ='EPA1' THEN
+					'EPA1'
+				END
+			) AS EPA1,
+			COUNT (
+				case
+				WHEN EP ='EPA3' THEN
+					'EPA3'
+				END
+			) AS EPA3
+
+			from t_part t where DR=0 
+			and PartName='ZKG缸体'
+			<if test="pd.startTime != null and pd.startTime != ''">
+				and CreateTime&gt;#{pd.startTime} 
+			</if>
+		
+			<if test="pd.endTime != null and pd.endTime != ''">
+				and CreateTime &lt;#{pd.endTime} 
+			</if> 
+			group by PartName
+	</select>
+	
+	<select id="getPartXXGG" parameterType="pd" resultType="pd">
+		select PartName,COUNT(*) as cou,COUNT (
+				CASE
+				WHEN EP ='EPA1' THEN
+					'EPA1'
+				END
+			) AS EPA1,
+			COUNT (
+				case
+				WHEN EP ='EPA3' THEN
+					'EPA3'
+				END
+			) AS EPA3
+
+			from t_part t where DR=0 
+			and PartName='ZK缸盖'
+			<if test="pd.startTime != null and pd.startTime != ''">
+				and CreateTime&gt;#{pd.startTime} 
+			</if>
+		
+			<if test="pd.endTime != null and pd.endTime != ''">
+				and CreateTime &lt;#{pd.endTime} 
+			</if> 
+			group by PartName
+	</select>
+	
+	<select id="getPartXXPHZ" parameterType="pd" resultType="pd">
+		select PartName,COUNT(*) as cou,COUNT (
+				CASE
+				WHEN EP ='EPA1' THEN
+					'EPA1'
+				END
+			) AS EPA1,
+			COUNT (
+				case
+				WHEN EP ='EPA3' THEN
+					'EPA3'
+				END
+			) AS EPA3
+
+			from t_part t where DR=0 
+			and PartName='AGW平衡轴'
+			<if test="pd.startTime != null and pd.startTime != ''">
+				and CreateTime&gt;#{pd.startTime} 
+			</if>
+		
+			<if test="pd.endTime != null and pd.endTime != ''">
+				and CreateTime &lt;#{pd.endTime} 
+			</if> 
+			group by PartName
+	</select>
+	<select id="getPartXXLG" parameterType="pd" resultType="pd">
+		select PartName,COUNT(*) as cou,COUNT (
+				CASE
+				WHEN EP ='EPA1' THEN
+					'EPA1'
+				END
+			) AS EPA1,
+			COUNT (
+				case
+				WHEN EP ='EPA3' THEN
+					'EPA3'
+				END
+			) AS EPA3
+
+			from t_part t where DR=0 
+			and PartName='PL连杆'
+			<if test="pd.startTime != null and pd.startTime != ''">
+				and CreateTime&gt;#{pd.startTime} 
+			</if>
+		
+			<if test="pd.endTime != null and pd.endTime != ''">
+				and CreateTime &lt;#{pd.endTime} 
+			</if> 
+			group by PartName
+	</select>
+	
+	
+	<select id="getPartXXQZ" parameterType="pd" resultType="pd">
+		select PartName,COUNT(*) as cou,COUNT (
+				CASE
+				WHEN EP ='EPA1' THEN
+					'EPA1'
+				END
+			) AS EPA1,
+			COUNT (
+				case
+				WHEN Address like '%下线点1' THEN
+					'EPA3'
+				END
+			) AS EPA2,
+			COUNT (
+				case
+				WHEN Address like '%下线点2' THEN
+					'EPA3'
+				END
+			) AS EPA3
+
+			from t_part t where DR=0 
+			and PartName='KW曲轴'
+			<if test="pd.startTime != null and pd.startTime != ''">
+				and CreateTime&gt;#{pd.startTime} 
+			</if>
+		
+			<if test="pd.endTime != null and pd.endTime != ''">
+				and CreateTime &lt;#{pd.endTime} 
+			</if> 
+			group by PartName
+			
+	</select>
+	<!-- 查询数量-->
+	<select id="getTrayTypeCountList" parameterType="pd" resultType="pd">
+		 SELECT
+			COUNT (
+				CASE
+				WHEN TrayType LIKE '%缸体%' THEN
+					'缸体'
+				END
+			) AS ZKGFullNum,
+			COUNT (
+				CASE
+				WHEN TrayType LIKE '%缸盖%' THEN
+					'缸盖'
+				END
+			) AS ZKNum,
+			COUNT (
+				CASE
+				WHEN TrayType LIKE '%连杆%' THEN
+					'连杆'
+				END
+			) AS PLNum,
+			COUNT (
+				CASE
+				WHEN TrayType LIKE '%曲轴%' THEN
+					'曲轴'
+				END
+			) AS QuZhouNum,
+		COUNT (
+				CASE
+				WHEN TrayType LIKE '%平衡轴%' THEN
+					'平衡轴'
+				END
+			) AS PingHengZhouNum
+		FROM
+			t_tray
+		WHERE
+			dr = 0
+	</select>
+	<select id="getDayTJ" parameterType="pd" resultType="pd">
+		 select top 1 PartName,
+			COUNT(
+				case when (createtime &gt;  convert(varchar(100),CAST(#{pd.startTime} as datetime ),23 )+' 04:30:00'  and createtime &lt;=convert(varchar(100),CAST(#{pd.startTime} as datetime ),23 )+' 16:30:00')then 1 end
+			)as S1,
+			COUNT(
+				case when (createtime &gt; convert(varchar(100),CAST(#{pd.startTime} as datetime ),23 )+' 16:30:00'  and createtime &lt;convert(varchar(100),CAST(#{pd.endTime} as datetime ),23 )+' 04:30:00')then 1 end
+			)as S2 ,
+			
+			
+			
+			
+			COUNT(
+				case when (EP ='EPA1' and createtime &gt;  convert(varchar(100),CAST(#{pd.startTime} as datetime ),23 )+' 04:30:00'  and createtime &lt;=convert(varchar(100),CAST(#{pd.startTime} as datetime ),23 )+' 16:30:00')then 1 end
+			)as S11,
+			
+			COUNT(
+				case when (EP ='EPA3' and createtime &gt;  convert(varchar(100),CAST(#{pd.startTime} as datetime ),23 )+' 04:30:00'  and createtime &lt;=convert(varchar(100),CAST(#{pd.startTime} as datetime ),23 )+' 16:30:00')then 1 end
+			)as S13,
+			
+			
+			COUNT(
+				case when (EP ='EPA1' and createtime &gt; convert(varchar(100),CAST(#{pd.startTime} as datetime ),23 )+' 16:30:00'  and createtime &lt;convert(varchar(100),CAST(#{pd.endTime} as datetime ),23 )+' 04:30:00')then 1 end
+			)as S21 ,
+			
+			COUNT(
+				case when (EP ='EPA3' and createtime &gt; convert(varchar(100),CAST(#{pd.startTime} as datetime ),23 )+' 16:30:00'  and createtime &lt;convert(varchar(100),CAST(#{pd.endTime} as datetime ),23 )+' 04:30:00')then 1 end
+			)as S23 ,
+			
+			
+			
+			COUNT(
+				case when (UseTime &gt; convert(varchar(100),CAST(#{pd.startTime} as datetime ),23 )+' 04:30:00'  and UseTime &lt; = convert(varchar(100),CAST(#{pd.startTime} as datetime ),23 )+' 16:30:00')then 1 end
+			)as S3,
+			COUNT(
+				case when (UseTime &gt; convert(varchar(100),CAST(#{pd.startTime} as datetime ),23 )+' 16:30:00'  and UseTime &lt;convert(varchar(100),CAST(#{pd.endTime} as datetime ),23 )+' 04:30:00')then 1 end
+			)as S4,
+			COUNT(
+				case when (EP ='EPA1' and UseTime &gt; convert(varchar(100),CAST(#{pd.startTime} as datetime ),23 )+' 04:30:00'  and UseTime &lt; = convert(varchar(100),CAST(#{pd.startTime} as datetime ),23 )+' 16:30:00')then 1 end
+			)as S31,
+			COUNT(
+				case when (EP ='EPA3' and UseTime &gt; convert(varchar(100),CAST(#{pd.startTime} as datetime ),23 )+' 04:30:00'  and UseTime &lt; = convert(varchar(100),CAST(#{pd.startTime} as datetime ),23 )+' 16:30:00')then 1 end
+			)as S33,
+			COUNT(
+				case when (EP ='EPA1' and UseTime &gt; convert(varchar(100),CAST(#{pd.startTime} as datetime ),23 )+' 16:30:00'  and UseTime &lt;convert(varchar(100),CAST(#{pd.endTime} as datetime ),23 )+' 04:30:00')then 1 end
+			)as S41,
+			COUNT(
+				case when (EP ='EPA3' and UseTime &gt; convert(varchar(100),CAST(#{pd.startTime} as datetime ),23 )+' 16:30:00'  and UseTime &lt;convert(varchar(100),CAST(#{pd.endTime} as datetime ),23 )+' 04:30:00')then 1 end
+			)as S43
+			from t_part where DR=0 
+			
+			<if test="pd.PartName != null and pd.PartName != ''">
+				and PartName=#{pd.PartName} 
+			</if>
+			
+			group by PartName 
+	</select>
+	
+	
+	<select id="getDayTJQZ" parameterType="pd" resultType="pd">
+		 select top 1 PartName,
+			COUNT(
+				case when (createtime &gt;  convert(varchar(100),CAST(#{pd.startTime} as datetime ),23 )+' 04:30:00'  and createtime &lt;=convert(varchar(100),CAST(#{pd.startTime} as datetime ),23 )+' 16:30:00')then 1 end
+			)as S1,
+			COUNT(
+				case when (createtime &gt; convert(varchar(100),CAST(#{pd.startTime} as datetime ),23 )+' 16:30:00'  and createtime &lt;convert(varchar(100),CAST(#{pd.endTime} as datetime ),23 )+' 04:30:00')then 1 end
+			)as S2 ,
+			
+			
+			
+			
+			COUNT(
+				case when (EP ='EPA1' and createtime &gt;  convert(varchar(100),CAST(#{pd.startTime} as datetime ),23 )+' 04:30:00'  and createtime &lt;=convert(varchar(100),CAST(#{pd.startTime} as datetime ),23 )+' 16:30:00')then 1 end
+			)as S11,
+			
+			COUNT(
+				case when (EP ='EPA3'  and Address like '%下线点1'  and createtime &gt;  convert(varchar(100),CAST(#{pd.startTime} as datetime ),23 )+' 04:30:00'  and createtime &lt;=convert(varchar(100),CAST(#{pd.startTime} as datetime ),23 )+' 16:30:00')then 1 end
+			)as S12,
+			
+			COUNT(
+				case when (EP ='EPA3'  and Address like '%下线点2'  and createtime &gt;  convert(varchar(100),CAST(#{pd.startTime} as datetime ),23 )+' 04:30:00'  and createtime &lt;=convert(varchar(100),CAST(#{pd.startTime} as datetime ),23 )+' 16:30:00')then 1 end
+			)as S13,
+			
+			
+			COUNT(
+				case when (EP ='EPA1' and createtime &gt; convert(varchar(100),CAST(#{pd.startTime} as datetime ),23 )+' 16:30:00'  and createtime &lt;convert(varchar(100),CAST(#{pd.endTime} as datetime ),23 )+' 04:30:00')then 1 end
+			)as S21 ,
+			
+			COUNT(
+				case when (EP ='EPA3' and Address like '%下线点1'   and createtime &gt; convert(varchar(100),CAST(#{pd.startTime} as datetime ),23 )+' 16:30:00'  and createtime &lt;convert(varchar(100),CAST(#{pd.endTime} as datetime ),23 )+' 04:30:00')then 1 end
+			)as S22 ,
+			COUNT(
+				case when (EP ='EPA3' and Address like '%下线点2'  and createtime &gt; convert(varchar(100),CAST(#{pd.startTime} as datetime ),23 )+' 16:30:00'  and createtime &lt;convert(varchar(100),CAST(#{pd.endTime} as datetime ),23 )+' 04:30:00')then 1 end
+			)as S23 ,
+			
+			
+			
+			COUNT(
+				case when (UseTime &gt; convert(varchar(100),CAST(#{pd.startTime} as datetime ),23 )+' 04:30:00'  and UseTime &lt; = convert(varchar(100),CAST(#{pd.startTime} as datetime ),23 )+' 16:30:00')then 1 end
+			)as S3,
+			COUNT(
+				case when (UseTime &gt; convert(varchar(100),CAST(#{pd.startTime} as datetime ),23 )+' 16:30:00'  and UseTime &lt;convert(varchar(100),CAST(#{pd.endTime} as datetime ),23 )+' 04:30:00')then 1 end
+			)as S4,
+			COUNT(
+				case when (EP ='EPA1' and UseTime &gt; convert(varchar(100),CAST(#{pd.startTime} as datetime ),23 )+' 04:30:00'  and UseTime &lt; = convert(varchar(100),CAST(#{pd.startTime} as datetime ),23 )+' 16:30:00')then 1 end
+			)as S31,
+			COUNT(
+				case when (EP ='EPA3' and UseTime &gt; convert(varchar(100),CAST(#{pd.startTime} as datetime ),23 )+' 04:30:00'  and UseTime &lt; = convert(varchar(100),CAST(#{pd.startTime} as datetime ),23 )+' 16:30:00')then 1 end
+			)as S33,
+			COUNT(
+				case when (EP ='EPA1' and UseTime &gt; convert(varchar(100),CAST(#{pd.startTime} as datetime ),23 )+' 16:30:00'  and UseTime &lt;convert(varchar(100),CAST(#{pd.endTime} as datetime ),23 )+' 04:30:00')then 1 end
+			)as S41,
+			COUNT(
+				case when (EP ='EPA3' and UseTime &gt; convert(varchar(100),CAST(#{pd.startTime} as datetime ),23 )+' 16:30:00'  and UseTime &lt;convert(varchar(100),CAST(#{pd.endTime} as datetime ),23 )+' 04:30:00')then 1 end
+			)as S43
+			from t_part  where DR=0  
+			
+			and PartName=#{pd.PartName} 
+			
+			group by PartName 
+	</select>
+	
+	
+</mapper>

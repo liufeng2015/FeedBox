@@ -1,0 +1,118 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+	"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="TrayPartRelInfoMapper">
+	
+	<!-- 新增 -->
+	<insert id="save" parameterType="pd">
+		insert into t_trayBoxRel (
+		    ID,
+		    TrayId,
+			TrayRFID,
+			TrayRFID2,
+			BoxQRCode,
+			BoxId,
+			State,
+			DR,
+			CreateTime,
+			CreateUser
+		) values (
+			#{ID},
+			#{TrayId},
+			#{TrayRFID},
+			#{TrayRFID2},
+			#{BoxQRCode},
+			#{BoxId},
+			#{State},
+			0,
+			#{CreateTime},
+			#{CreateUser}
+		)
+	</insert>
+	
+	<!-- 列表：查询当前位置的托盘列表 -->
+	<select id="getTrayListPage" parameterType="page" resultType="pd">
+		SELECT * FROM
+			(	SELECT DISTINCT
+					ROW_NUMBER () OVER (ORDER BY t1.QuWei DESC,t1.UpdateTime ASC) AS rowId,
+					t2.id AS ConfId,
+					t2.Address AS ConfigAddress,
+					t1.*
+				FROM
+					t_tray t1
+				LEFT JOIN t_config t2 ON t2.Address = t1.Address
+				AND t2.DR = 0
+				WHERE
+					t1.DR = 0
+				<if test="pd.Address != null and pd.Address != ''">
+					and t1.Address  like '%'+#{pd.Address} +'%'		
+				</if>
+				<if test="pd.State != null and pd.State != ''">
+					and t1.State = #{pd.State} 
+				</if>
+			) AS mytable
+		WHERE
+			1 = 1	
+	</select>
+	
+	<!-- 查询选中托盘的箱子条数，及每个箱子满箱数量 -->
+	<select id="findSelectBoxCount" parameterType="page" resultType="pd">
+		SELECT
+			ROW_NUMBER () OVER (ORDER BY t1.CreateTime ASC) AS rowId,
+			t1.*, t2.FullNumber
+		FROM
+			t_trayBoxRel t1
+		LEFT JOIN t_box t2 ON t2.ID = t1.BoxId
+		AND t2.DR = 0
+		WHERE
+			t1.DR = 0
+		<if test="pd.TrayId != null and pd.TrayId != ''">
+			and t1.TrayId = #{pd.TrayId} 
+		</if>
+		<if test="pd.TrayRFID != null and pd.TrayRFID != ''">
+			and t1.TrayRFID = #{pd.TrayRFID} 
+		</if>
+	</select>
+	
+	<!-- 列表(全部) -->
+	<select id="listAll" parameterType="pd" resultType="pd">
+		select
+				a.*
+		from 
+				t_trayBoxRel a
+		where a.DR = 0
+		<if test="TrayId != null and TrayId != ''">
+			and a.TrayId = #{TrayId} 
+		</if>
+		<if test="BoxId != null and BoxId != ''">
+			and a.BoxId = #{BoxId} 
+		</if>
+	</select>
+	
+	<!-- 删除单条关系数据 -->
+	<update id="delete" parameterType="pd">
+			update  t_trayBoxRel set			
+			DeleteTime=#{DeleteTime},
+			DeleteUser=#{DeleteUser},
+			DR=1,
+			State = 1	
+			where ID = #{ID}
+	</update>
+	
+	<!-- 箱号数字 -->
+	<update id="updateXiangHao" parameterType="pd">
+			update  t_xianghao set			
+			num = num+1	
+			where Address = #{Address}
+	</update>
+	
+	
+	<!-- 获取箱号 -->
+	<select id="getXiangHaoNum" parameterType="pd" resultType="pd">
+		select
+				a.*
+		from 
+				t_xianghao a
+		where a.Address = #{Address}
+	</select>
+</mapper>

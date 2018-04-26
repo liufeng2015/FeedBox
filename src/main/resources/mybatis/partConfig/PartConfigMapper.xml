@@ -1,0 +1,100 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+	"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="PartConfigMapper">
+	
+	<!-- 修改 -->
+	<update id="edit" parameterType="pd">
+		update  t_partConfig
+			set 
+				IP= #{IP},
+				Address= #{Address},
+				Remark= #{Remark},
+				TrayType=#{TrayType},
+				Port=#{Port},
+				EP=#{EP},
+				Len=#{Len},
+				UpdateTime  = #{UpdateTime},
+				UpdateUser  = #{UpdateUser}				
+			where 
+				PC_ID = #{PC_ID}
+	</update>
+	
+	<!-- 通过id获取数据 -->
+	<select id="findById" parameterType="pd" resultType="pd">
+		select top 1 *
+		from 
+			t_partConfig
+		where 
+			PC_ID = #{PC_ID}
+	</select>
+	
+	<!-- 通过名称获取数据 -->
+	<select id="findByIP" parameterType="pd" resultType="pd">
+		select top 1 *
+		from 
+			t_partConfig
+		where 
+			IP = #{IP}
+			<if test="Port != null and Port != ''">
+				and Port=#{Port}
+			</if>
+	</select>
+	
+	<!-- 新增 -->
+	<insert id="save" parameterType="pd">
+		insert into t_partConfig (
+				PC_ID,
+				IP,
+				Address,
+				Remark,
+				TrayType,
+				Port,
+				DR,
+				EP,
+				Len,
+				CreateTime,
+				CreateUser
+		) values (
+			#{PC_ID},
+			#{IP},
+			#{Address},
+			#{Remark},
+			#{TrayType},
+			#{Port},
+			0,
+			#{EP},
+			#{Len},
+			#{CreateTime},
+			#{CreateUser}
+		)
+	</insert>
+	
+	<!-- 列表 -->
+	<select id="dictlistPage" parameterType="page" resultType="pd">
+		 select * FROM (  
+					select ROW_NUMBER()Over(order by z1.IP ) as rowId, * from t_partConfig z1 
+					where DR=0		
+					 	<if test="pd.FuzzySearch != null and pd.FuzzySearch != ''">
+							and (
+									IP like '%'+#{pd.FuzzySearch} +'%' 	
+								or  Address	like '%'+#{pd.FuzzySearch} +'%' 
+								or  Remark	like '%'+#{pd.FuzzySearch} +'%' 				
+							)
+						</if>
+				)as mytable  where 1=1  
+	</select>
+	<select id="findAll" parameterType="pd" resultType="pd">
+		select * from t_partConfig where dr=0
+	</select>
+	
+	<!-- 删除 -->
+	<update id="delete" parameterType="pd">
+			update  t_partConfig set			
+			DeleteTime=#{DeleteTime},
+			DeleteUser=#{DeleteUser},
+			DR=1			
+			where PC_ID = #{PC_ID}
+	</update>
+	
+</mapper>
